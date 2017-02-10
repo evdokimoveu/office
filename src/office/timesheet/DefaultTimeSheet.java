@@ -9,15 +9,14 @@ import java.util.Map;
  *
  * @author EvdokimovEU
  */
-public class DefaultTimeSheet {
+public class DefaultTimeSheet implements TimeSheet{
     
     private Map<Integer, WorkDay> days;    
     private Calendar calendar;
     private int duration;
 
     public DefaultTimeSheet() {
-        this(8 * 60);
-        
+        this(8 * 60);        
     }
 
     public DefaultTimeSheet(int duration) {        
@@ -26,6 +25,7 @@ public class DefaultTimeSheet {
         create();
     }
     
+    @Override
     public void updateDay(Integer dayNumber, Integer duration, Boolean weekday){
         if(dayNumber != null){
             WorkDay workDay = days.get(dayNumber);
@@ -39,6 +39,11 @@ public class DefaultTimeSheet {
                 days.put(dayNumber, workDay);
             }
         }
+    }
+    
+    @Override
+    public WorkDay getWorkDay(int day) {
+        return days.get(day);
     }
     
     private void create(){        
@@ -58,4 +63,5 @@ public class DefaultTimeSheet {
             days.put(i, workDay);
         }
     }
+   
 }
