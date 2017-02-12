@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -61,6 +62,13 @@ public class Emploee {
     
     private void createPosition(){
         positions = new HashMap<>();
+        Random random = new Random();
+        int positionCount = random.nextInt(5) + 1;
+        Task[] t = Task.values();        
+        for(int i = 0; i < positionCount; i++){
+            String positionName = t[random.nextInt(5) + 1].getTaskName();
+            positions.put(positionName, getPosition(positionName));
+        }
     }
     
     private class EnploeeRun extends TimerTask {
@@ -127,6 +135,30 @@ public class Emploee {
             Logger.getLogger(Emploee.class.getName()).log(Level.SEVERE, null, ex);
         }        
         return tasksCompleted;
+    }
+    
+    private Position getPosition(String positionName){
+        if(positionName.equals(Programmer.NAME)){
+            return new Programmer(15);
+        }
+        else if(positionName.equals(Designer.NAME)){
+            return new Designer(13);
+        }
+        else if(positionName.equals(Accountant.NAME)){
+            return new Accountant(1000);
+        }
+        else if(positionName.equals(Director.NAME)){
+            return new Director(2000);
+        }
+        else if(positionName.equals(SalesManager.NAME)){
+            return new SalesManager(1200);
+        }
+        else if(positionName.equals(Tester.NAME)){
+            return new Tester(14);
+        }
+        else{
+            throw new IllegalArgumentException("Position name : " +  positionName + " doesn't exists");
+        }
     }
     
     public interface NewTaskCallBack {
