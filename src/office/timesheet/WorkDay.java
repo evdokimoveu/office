@@ -5,7 +5,7 @@ package office.timesheet;
  *
  * @author EvdokimovEU
  */
-class WorkDay {
+public class WorkDay {
     private int dayNumber;
     private int duration;//Default value 8 * 60 minute
     private boolean weekday;
