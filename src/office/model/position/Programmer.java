@@ -1,6 +1,7 @@
 
 package office.model.position;
 
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import office.model.Position;
@@ -26,6 +27,8 @@ public class Programmer implements Position {
     @Override
     public Task call() {
         try {
+            Random random = new Random();            
+            hoursWorked = hoursWorked + random.nextInt(3600) + 3600;
             task.setDeadline(hoursWorked);            
             task.setWageRate(wageRate);
             Thread.sleep(hoursWorked);

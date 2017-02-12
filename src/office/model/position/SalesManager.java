@@ -1,8 +1,6 @@
 
 package office.model.position;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import office.model.Position;
 import office.model.Task;
 
@@ -15,7 +13,6 @@ public class SalesManager implements Position{
     public static final String NAME = "SalesManager";
     
     private final int wageRate;
-    private int hoursWorked;
     private Task task;
 
     public SalesManager(int wageRate) {
@@ -24,13 +21,7 @@ public class SalesManager implements Position{
 
     @Override
     public Task call() throws Exception {
-        try {
-            task.setDeadline(hoursWorked);            
-            task.setWageRate(wageRate);
-            Thread.sleep(hoursWorked);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Designer.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        task.setWageRate(wageRate);
         return task;
     }
 
