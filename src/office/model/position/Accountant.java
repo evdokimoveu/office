@@ -2,6 +2,7 @@
 package office.model.position;
 
 import office.model.Position;
+import office.model.Task;
 
 /**
  *
@@ -17,17 +18,27 @@ public class Accountant implements Position{
         this.wageRate = wageRate;
     }
     
-    @Override
-    public String getName() {
-        return NAME;
-    }
-    
     public void createOrder(){
     
     }
     
     public void assessmentSalary(){
     
+    }
+
+    @Override
+    public void setTask(Task task) {
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }
+
+    @Override
+    public Task getTask() {
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }
+
+    @Override
+    public Task call() throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
     

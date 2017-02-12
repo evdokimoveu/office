@@ -1,7 +1,10 @@
 
 package office.model.position;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import office.model.Position;
+import office.model.Task;
 
 /**
  *
@@ -11,8 +14,9 @@ public class Programmer implements Position {
     
     public static final String NAME = "programmer";
     
-    private int wageRate;
+    private final int wageRate;
     private int hoursWorked;
+    private Task task;
 
     public Programmer(int wageRate) {
         this.wageRate = wageRate;
@@ -20,12 +24,25 @@ public class Programmer implements Position {
     }
     
     @Override
-    public String getName() {
-        return NAME;
-    }
-        
-    public void doTask(){
+    public Task call() {
+        try {
+            task.setDeadline(hoursWorked);            
+            task.setWageRate(wageRate);
+            Thread.sleep(hoursWorked);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Designer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return task;
     }
 
-   
+    @Override
+    public void setTask(Task task) {
+        this.task = task;
+    }
+    
+    @Override
+    public Task getTask() {
+        return task;
+    }
+        
 }

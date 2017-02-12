@@ -15,19 +15,19 @@ public class Director implements Position {
     
     private int wageRate;
     
-    @Override
-    public String getName() {
-        return NAME;
-    }
-    
     public Director(int wageRate) {
         this.wageRate = wageRate;
     }
     
     public Task makeTask(){
         Random random = new Random();
-        int i = random.nextInt(Task.values().length - 1);
+        int i = random.nextInt(Task.values().length - 1);        
         return Task.values()[i];
+    }
+
+    @Override
+    public Task call() throws Exception {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public int getWageRate() {
@@ -37,7 +37,15 @@ public class Director implements Position {
     public void setWageRate(int wageRate) {
         this.wageRate = wageRate;
     }
-    
-    
 
+    @Override
+    public void setTask(Task task) {
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }
+
+    @Override
+    public Task getTask() {
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }
+    
 }
