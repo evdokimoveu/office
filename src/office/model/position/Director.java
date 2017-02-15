@@ -21,7 +21,7 @@ public class Director implements Position {
     
     public Task makeTask(){
         Random random = new Random();
-        int i = random.nextInt(Task.values().length - 1);        
+        int i = random.nextInt(Task.values().length);        
         return Task.values()[i];
     }
 

@@ -22,6 +22,7 @@ public class SalesManager implements Position{
     @Override
     public Task call() throws Exception {
         task.setWageRate(wageRate);
+        task.setDeadline(1);
         return task;
     }
 

@@ -13,9 +13,9 @@ import office.model.position.Tester;
 
 public enum Task{
     Prog(Programmer.NAME, "Писать код"),    
-    Sale(SalesManager.NAME, "Продавать"),
-    Design(Designer.NAME, "Дизайн"),
-    Test(Tester.NAME, "Тестировать");
+    Sale(SalesManager.NAME, "Продавать услуги"),
+    Design(Designer.NAME, "Рисовать макет"),
+    Test(Tester.NAME, "Тестировать программу");
     
     private final String positionName;
     private final String taskName;
@@ -28,6 +28,10 @@ public enum Task{
         this.taskName = taskName;
     }
 
+    public int getTaskPayment(){
+        return wageRate * deadline;
+    }
+    
     public String getPositionName() {
         return positionName;
     }

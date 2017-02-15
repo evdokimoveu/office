@@ -2,7 +2,6 @@
 package office.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import office.model.position.Accountant;
+import office.Office;
 import office.model.position.Designer;
 import office.model.position.Director;
 import office.model.position.Programmer;
@@ -33,72 +32,152 @@ import office.timesheet.WorkDay;
  */
 public class Emploee {
     
+    private final String name;
     private Boolean free;
+    private final boolean createDirector;
+    private final boolean createManager;
+    private int dayNumber;
+    private WorkDay day;
+    private final long startTime;
+    private List<Task> tasksCompleted;
+    private List<Integer> salaries;
     private Map<String, Position> positions;
     private final TimeSheet timeSheet;
-    private NewTaskCallBack newTaskCallBack;
-    private CompletedTaskCallBack completedTaskCallBack;
-    private List<Task> tasks;
+    private final NewTaskCallBack newTaskCallBack;
+    
 
-    public Emploee(TimeSheet timeSheet) {
-        this.timeSheet = timeSheet;
-        this.tasks = Collections.synchronizedList(new ArrayList<>());
+    /**
+     * 
+     * @param office
+     * @param name
+     * @param timeSheet
+     * @param createDirector
+     * @param createManager
+     */
+    public Emploee(Office office, String name, TimeSheet timeSheet, Boolean createDirector, Boolean createManager) {
+        this.timeSheet = timeSheet;        
+        this.createDirector = createDirector;
+        this.createManager = createManager;
+        this.free = true;
+        this.newTaskCallBack = office;
+        this.startTime = System.currentTimeMillis();
+        this.name = name;
+        
         createPosition();
     }
     
     public void start(int dayNumber){
-        WorkDay day = timeSheet.getWorkDay(dayNumber);
+        this.dayNumber = dayNumber;
+        this.day = timeSheet.getWorkDay(this.dayNumber);        
         Timer timer = new Timer();
-        timer.schedule(new EnploeeRun(), day.getDuration());
+        timer.schedule(new DirectorRun(), 0);
+        if(System.currentTimeMillis() - startTime > day.getDuration()){
+            timer.cancel();
+        }        
     }
     
+    public void startTask(Task task){
+        Timer timer = new Timer();
+        timer.schedule(new TaskRun(task), 0);
+        if(System.currentTimeMillis() - startTime > day.getDuration()){
+            timer.cancel();
+        }
+    }
+
     public Set<String> getPositionName(){
         return positions.keySet();
     }   
 
-    public void setTasks(List<Task> tasks) {
-        this.tasks = tasks;
+    public Map<String, Position> getPositions() {
+        return positions;
+    }    
+    
+    public Boolean isFree() {
+        return free;
     }
+
+    public void setFree(Boolean free) {
+        this.free = free;
+    }
+    
+    public boolean isPositionExists(String positionName){
+        return positions.containsKey(positionName);        
+    }
+
+    public List<Integer> getSalaries() {
+        return salaries;
+    }
+
+    public void addSalaries(int salary) {
+        this.salaries.add(salary);
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public List<Task> getTasksCompleted() {
+        return tasksCompleted;
+    }    
     
     private void createPosition(){
         positions = new HashMap<>();
         Random random = new Random();
-        int positionCount = random.nextInt(5) + 1;
-        Task[] t = Task.values();        
-        for(int i = 0; i < positionCount; i++){
-            String positionName = t[random.nextInt(5) + 1].getTaskName();
-            positions.put(positionName, getPosition(positionName));
+        int positionCount = random.nextInt(4) + 1;        
+        Task[] t = Task.values();
+        List<String> pos = new ArrayList<>();
+        for (Task t1 : t) {
+            pos.add(t1.getPositionName());
         }
+        pos.add(Director.NAME);
+        if(createDirector){
+            positions.put(Director.NAME, getPosition(Director.NAME));
+        }
+        if(createManager){
+            positions.put(SalesManager.NAME, getPosition(SalesManager.NAME));
+        }
+        for(int i = 0; i < positionCount; i++){
+            String positionName = pos.get(random.nextInt(5));
+            positions.put(positionName, getPosition(positionName));
+        }        
     }
-    
-    private class EnploeeRun extends TimerTask {
 
+    private class DirectorRun extends TimerTask {
+       
+        
         @Override
-        public void run() {
+        public void run() {            
             if(positions.containsKey(Director.NAME)){
                 ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-                executorService.scheduleAtFixedRate(() -> {
+                executorService.scheduleAtFixedRate(() -> {                    
+                    if(System.currentTimeMillis() - startTime > day.getDuration()){
+                        executorService.shutdown();
+                    }
                     if(free){
                         free = false;
                         Director director = (Director) positions.get(Director.NAME);
-                        newTaskCallBack.newTaskCall(director.makeTask());
+                        Task task = director.makeTask();                        
+                        newTaskCallBack.newTaskCall(task);
                         free = true;
-                    }
-                }, 0, 1, TimeUnit.HOURS);                
-            }            
-            if(positions.containsKey(Accountant.NAME)){
-                if(free){
-                    free = false;
-                    Accountant accountant = (Accountant) positions.get(Accountant.NAME);
-                    accountant.assessmentSalary();
-                    accountant.createOrder();
-                    free = true;
-                }                
+                    }                    
+                }, 0, 1, TimeUnit.SECONDS);
             }
-            if(tasks.size() > 0){
-                free = false;
-                Task task = tasks.get(0);
-                String position = task.getPositionName();
+        }
+    }
+    
+    public class TaskRun extends TimerTask {
+
+        private final Task task;
+
+        public TaskRun(Task task) {
+            this.task = task;
+        }
+        
+        @Override
+        public void run() {
+
+            free = false;
+            String position = task.getPositionName();
                 if(position.equals(Programmer.NAME)){
                     Programmer programmer = (Programmer) positions.get(Programmer.NAME);
                     doTask(programmer, task);
@@ -114,39 +193,34 @@ public class Emploee {
                 if(position.equals(Tester.NAME)){
                     Tester tester = (Tester) positions.get(Tester.NAME);
                     doTask(tester, task);
-                }                
-                tasks.clear();
-                free = true;
-            }
+                } 
+            free = true;
+        }
+        
+        private Task doTask(Position position, Task task){            
+            position.setTask(task);
+            ExecutorService exService = Executors.newSingleThreadExecutor();
+            Future<Task> callFuture = exService.submit(position);
+            Task taskCompleted = null;
+            try {
+                taskCompleted = callFuture.get();
+                exService.awaitTermination(30, TimeUnit.SECONDS);
+                exService.shutdownNow();
+                tasksCompleted.add(taskCompleted);
+            } catch (InterruptedException | ExecutionException ex) {
+                Logger.getLogger(Emploee.class.getName()).log(Level.SEVERE, null, ex);
+            }        
+            return taskCompleted;
         }
     }
-    
-    private Task doTask(Position position, Task task){
-        position.setTask(task);
-        ExecutorService exService = Executors.newSingleThreadExecutor();
-        Future<Task> callFuture = exService.submit(position);
-        Task tasksCompleted = null;
-        try {
-            tasksCompleted = callFuture.get();
-            exService.awaitTermination(30, TimeUnit.SECONDS);
-            exService.shutdownNow();
-            completedTaskCallBack.completedTaskCall(tasksCompleted);
-        } catch (InterruptedException | ExecutionException ex) {
-            Logger.getLogger(Emploee.class.getName()).log(Level.SEVERE, null, ex);
-        }        
-        return tasksCompleted;
-    }
-    
-    private Position getPosition(String positionName){
+            
+    private Position getPosition(String positionName){        
         if(positionName.equals(Programmer.NAME)){
             return new Programmer(15);
         }
         else if(positionName.equals(Designer.NAME)){
             return new Designer(13);
-        }
-        else if(positionName.equals(Accountant.NAME)){
-            return new Accountant(1000);
-        }
+        }        
         else if(positionName.equals(Director.NAME)){
             return new Director(2000);
         }
@@ -163,9 +237,5 @@ public class Emploee {
     
     public interface NewTaskCallBack {
         void newTaskCall(Task task);
-    }
-
-    public interface CompletedTaskCallBack {
-        void completedTaskCall(Task task);
     }
 }
