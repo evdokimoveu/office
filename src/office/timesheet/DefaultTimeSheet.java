@@ -16,12 +16,17 @@ public class DefaultTimeSheet implements TimeSheet{
     private int duration;
 
     public DefaultTimeSheet() {
-        this(8 * 60);        
+        this(8 * 3600 * 1000);
     }
 
     public DefaultTimeSheet(int duration) {        
         this.calendar = Calendar.getInstance();
-        this.duration = duration;
+        if(duration < 24 * 3600 * 1000){
+            this.duration = duration;
+        }
+        else{
+            throw new IllegalArgumentException("Duration can not be more than 24 hours");
+        }
         create();
     }
     
@@ -63,5 +68,4 @@ public class DefaultTimeSheet implements TimeSheet{
             days.put(i, workDay);
         }
     }
-   
 }
