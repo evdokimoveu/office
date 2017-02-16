@@ -28,8 +28,8 @@ public class Tester implements Position{
     public Task call() throws Exception {
         try {
             Random random = new Random();            
-            hoursWorked = random.nextInt(3600) + 3600;
-            double deadline = BigDecimal.valueOf(hoursWorked / (3600 * 1.0)).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
+            hoursWorked = random.nextInt(3600 * 1000) + 3600 * 1000;
+            double deadline = BigDecimal.valueOf(hoursWorked / (3600 * 1000.0)).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
             task.setDeadline(deadline);
             task.setWageRate(wageRate);
             Thread.sleep(hoursWorked);

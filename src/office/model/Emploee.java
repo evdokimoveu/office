@@ -163,7 +163,7 @@ public class Emploee {
                         }
                         free = true;
                     }                    
-                }, 0, 3600, TimeUnit.MILLISECONDS);
+                }, 0, 1, TimeUnit.HOURS);
             }
         }
     }
