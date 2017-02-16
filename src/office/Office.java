@@ -4,7 +4,6 @@ package office;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executors;
@@ -23,10 +22,8 @@ import office.timesheet.DefaultTimeSheet;
  */
 public class Office implements Emploee.NewTaskCallBack {
     
-    public static final List<Task> NEW_TASK = Collections.synchronizedList(new ArrayList<>());
-    //public static final List<Task> COMPLETED_TASK = Collections.synchronizedList(new ArrayList<>());
     
-    private Accountant accountant;
+    private final Accountant accountant;
     private List<Emploee> emploees;
     private final List<Task> freelance;
     private final Calendar calendar;
@@ -35,6 +32,7 @@ public class Office implements Emploee.NewTaskCallBack {
     public Office() {
         this.calendar = Calendar.getInstance();
         this.freelance = new ArrayList<>();
+        this.accountant = new Accountant(1500);
         createEmloee();
         startWork();
     }  
@@ -48,8 +46,7 @@ public class Office implements Emploee.NewTaskCallBack {
 
     
     @Override
-    public synchronized void newTaskCall(Task task) {        
-        NEW_TASK.add(task);
+    public synchronized void newTaskCall(Task task) {
         for(int i = 0; i < emploees.size(); i++){
             if(emploees.get(i).isFree() && emploees.get(i).isPositionExists(task.getPositionName())){
                 emploees.get(i).setFree(false);
@@ -66,7 +63,7 @@ public class Office implements Emploee.NewTaskCallBack {
     
     private void createEmloee() {
         Random r = new Random();
-        int emploeeCount = r.nextInt(90) + 9;
+        int emploeeCount = r.nextInt(90) + 10;
         emploees = new ArrayList<>();
         
         //Create Emploee with director and Sales Manager
@@ -84,20 +81,21 @@ public class Office implements Emploee.NewTaskCallBack {
         executorService.scheduleAtFixedRate(() -> {
             for(int i = 0; i < emploees.size(); i++){
                 emploees.get(i).start(currentDay);
-            }        
+            }
             ++currentDay;
             calendar.set(Calendar.DAY_OF_MONTH, currentDay);
-        }, 0, 1, TimeUnit.DAYS);
-        if(calendar.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY){
-            accountant.assessmentSalary(emploees);
-        }
-        if(calendar.get(Calendar.DAY_OF_MONTH) == calendar.getActualMaximum(Calendar.DAY_OF_MONTH)){
-            try {
-                accountant.createReport(emploees, freelance);
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(Office.class.getName()).log(Level.SEVERE, null, ex);
+            if(calendar.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY){
+                accountant.assessmentSalary(emploees);
             }
-            executorService.shutdown();
-        }        
+            if(calendar.get(Calendar.DAY_OF_MONTH) == calendar.getActualMaximum(Calendar.DAY_OF_MONTH)){
+                try {
+                    accountant.createReport(emploees, freelance);
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(Office.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                executorService.shutdown();
+            }
+        }, 0, 1, TimeUnit.DAYS);
     }
+
 }

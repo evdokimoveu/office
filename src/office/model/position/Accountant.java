@@ -3,7 +3,6 @@ package office.model.position;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import office.model.Emploee;
@@ -19,58 +18,75 @@ public class Accountant {
     public static final String NAME = "Accountant";
     
     private final int wageRate;
-    private List<Integer> salaries;
 
     public Accountant(int wageRate) {
         this.wageRate = wageRate;
-        this.salaries = new ArrayList<>();
     }
 
+    /**
+     * Assessment salaries in last week's day 
+     * @param emploees 
+     */
     public void assessmentSalary(List<Emploee> emploees){
         int salary;
-        salaries.add(wageRate);
         for(Emploee emploee : emploees){
             salary = 0;
-            List<Task> tasks = emploee.getTasksCompleted();
-            for(Task task : tasks){
+            List<Task> tasks = emploee.getTasksCompleted();            
+            for(Task task : tasks){                
                 salary = salary + task.getTaskPayment();
-            }
-            Map<String, Position> mapPosition = emploee.getPositions();
-            if(mapPosition.containsKey(Director.NAME)){
+            }            
+            Map<String, Position> mapPosition = emploee.getPositions();            
+            
+            //Add fixed wage rate to salary
+            if(mapPosition.containsKey(Director.NAME)){                
                 Director director = (Director) mapPosition.get(Director.NAME);
                 salary = salary + director.getWageRate();
-                emploee.addSalaries(salary);
             }
+            
+            //Add fixed wage rate to salary
+            if(mapPosition.containsKey(SalesManager.NAME)){
+                SalesManager manager = (SalesManager) mapPosition.get(SalesManager.NAME);
+                salary = salary + manager.getWageRate();
+            }
+            emploee.addSalaries(salary);
         }        
     }
     
+    /**
+     * Create report in last day of month
+     * @param emploees
+     * @param freelance
+     * @throws FileNotFoundException 
+     */
     public void createReport(List<Emploee> emploees, List<Task> freelance) throws FileNotFoundException{
+        
         StringBuilder strBuilder = new StringBuilder();
         PrintWriter writeReport = new PrintWriter("report.txt");
-        
-        strBuilder
-                .append("                    Отчет о выполненной работе                      ")
-                .append("--------------------------------------------------------------------")
-                .append("|           Имя            |  Выполненно заданий  | Начисленно з/п |");
+                
+        writeReport.println("                    Отчет о выполненной работе                      ");
+        writeReport.println("--------------------------------------------------------------------");
+        writeReport.println("|           Имя            |  Выполненно заданий  | Начисленно з/п |");
         
         writeReport.println(strBuilder.toString());
-                       
-        emploees.forEach((emploee) -> {
+        
+        emploees.forEach((emploee) -> {            
             int taskCount = emploee.getTasksCompleted().size();
             int sumSalary = 0;
             strBuilder.setLength(0);
-            for(Integer salary : emploee.getSalaries()){
-                    sumSalary = sumSalary + salary;
+            for(Integer salary : emploee.getSalaries()){                
+                sumSalary = sumSalary + salary;
             }
-            
-            strBuilder.append("|                          |                      |                |");                
+            strBuilder.append("|                          |                      |                |");
             strBuilder
-                    .replace(2, emploee.getName().length(), emploee.getName())
-                    .replace(29, String.valueOf(taskCount).length(), String.valueOf(taskCount))
-                    .replace(29, String.valueOf(sumSalary).length(), String.valueOf(sumSalary));
+                    .replace(2, emploee.getName().length()+2, emploee.getName())
+                    .replace(29, String.valueOf(taskCount).length()+29, String.valueOf(taskCount))
+                    .replace(52, String.valueOf(sumSalary).length()+52, String.valueOf(sumSalary));
             writeReport.println(strBuilder.toString());
         });
-        writeReport.println(" Отдано заданий фрилансерам : " + freelance.size());
+        
+        writeReport.println("| Бухгалтер                |                      | " + wageRate + "           |");
+        writeReport.println("--------------------------------------------------------------------");
+        writeReport.println("     Отдано заданий фрилансерам : " + freelance.size());
         writeReport.close();
     }    
 }

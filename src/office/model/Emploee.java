@@ -39,8 +39,8 @@ public class Emploee {
     private int dayNumber;
     private WorkDay day;
     private final long startTime;
-    private List<Task> tasksCompleted;
-    private List<Integer> salaries;
+    private final List<Task> tasksCompleted;
+    private final List<Integer> salaries;
     private Map<String, Position> positions;
     private final TimeSheet timeSheet;
     private final NewTaskCallBack newTaskCallBack;
@@ -62,7 +62,8 @@ public class Emploee {
         this.newTaskCallBack = office;
         this.startTime = System.currentTimeMillis();
         this.name = name;
-        
+        this.tasksCompleted = new ArrayList<>();
+        this.salaries = new ArrayList<>();
         createPosition();
     }
     
@@ -109,7 +110,7 @@ public class Emploee {
     }
 
     public void addSalaries(int salary) {
-        this.salaries.add(salary);
+        salaries.add(salary);
     }
     
     public String getName() {
@@ -160,7 +161,7 @@ public class Emploee {
                         newTaskCallBack.newTaskCall(task);
                         free = true;
                     }                    
-                }, 0, 1, TimeUnit.SECONDS);
+                }, 0, 1, TimeUnit.HOURS);
             }
         }
     }
@@ -175,7 +176,7 @@ public class Emploee {
         
         @Override
         public void run() {
-
+                        
             free = false;
             String position = task.getPositionName();
                 if(position.equals(Programmer.NAME)){
@@ -204,7 +205,7 @@ public class Emploee {
             Task taskCompleted = null;
             try {
                 taskCompleted = callFuture.get();
-                exService.awaitTermination(30, TimeUnit.SECONDS);
+                exService.awaitTermination(3, TimeUnit.SECONDS);
                 exService.shutdownNow();
                 tasksCompleted.add(taskCompleted);
             } catch (InterruptedException | ExecutionException ex) {
@@ -225,7 +226,7 @@ public class Emploee {
             return new Director(2000);
         }
         else if(positionName.equals(SalesManager.NAME)){
-            return new SalesManager(1200);
+            return new SalesManager(1500);
         }
         else if(positionName.equals(Tester.NAME)){
             return new Tester(14);

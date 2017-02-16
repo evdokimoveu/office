@@ -28,7 +28,7 @@ public class Programmer implements Position {
     public Task call() {
         try {
             Random random = new Random();            
-            hoursWorked = hoursWorked + random.nextInt(3600) + 3600;
+            hoursWorked = hoursWorked + random.nextInt(3600 * 1000) + 3600 * 1000;
             task.setDeadline(hoursWorked);            
             task.setWageRate(wageRate);
             Thread.sleep(hoursWorked);

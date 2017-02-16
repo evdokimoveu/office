@@ -35,7 +35,7 @@ public class DefaultTimeSheet implements TimeSheet{
         if(dayNumber != null){
             WorkDay workDay = days.get(dayNumber);
             if(workDay != null){
-                if(duration != null){
+                if(duration != null && duration < 24 * 3600 * 1000){
                     workDay.setDuration(duration);
                 }
                 if(weekday != null){
@@ -51,20 +51,23 @@ public class DefaultTimeSheet implements TimeSheet{
         return days.get(day);
     }
     
+    //Create default duration
     private void create(){        
         days = new HashMap<>();
         int dayCount = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
         boolean weekday;
         for(int i = 1; i <= dayCount; i++){
             calendar.set(Calendar.DAY_OF_MONTH, i);
+            WorkDay workDay = null;
             if(calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY 
                     || calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY){
                 weekday = false;
+                workDay = new WorkDay(i, 0, weekday);
             }
             else{
                 weekday = true;
+                workDay = new WorkDay(i, duration, weekday);
             }
-            WorkDay workDay = new WorkDay(i, duration, weekday);
             days.put(i, workDay);
         }
     }
