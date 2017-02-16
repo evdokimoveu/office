@@ -1,6 +1,7 @@
 
 package office.model;
 
+import java.math.BigDecimal;
 import office.model.position.Designer;
 import office.model.position.Programmer;
 import office.model.position.SalesManager;
@@ -21,15 +22,15 @@ public enum Task{
     private final String taskName;
     private String taskPerformer;
     private int wageRate;
-    private int deadline;
+    private BigDecimal deadline;
 
     private Task(String positionName, String taskName) {
         this.positionName = positionName;
         this.taskName = taskName;
     }
 
-    public int getTaskPayment(){
-        return wageRate * deadline;
+    public BigDecimal getTaskPayment(){
+        return deadline.multiply(BigDecimal.valueOf(wageRate));
     }
     
     public String getPositionName() {
@@ -56,12 +57,12 @@ public enum Task{
         this.wageRate = wageRate;
     }
 
-    public int getDeadline() {
+    public BigDecimal getDeadline() {
         return deadline;
     }
 
-    public void setDeadline(int deadline) {
-        this.deadline = deadline;
+    public void setDeadline(double deadline) {
+        this.deadline = BigDecimal.valueOf(deadline);
     }
     
 }

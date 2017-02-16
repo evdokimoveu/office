@@ -1,6 +1,8 @@
 
 package office.model.position;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import office.model.Position;
 import office.model.Task;
@@ -14,15 +16,27 @@ public class Director implements Position {
     public static final String NAME = "Director";
     
     private int wageRate;
+    private final int limit;
     
-    public Director(int wageRate) {
+    public Director(int wageRate, int limit) {
         this.wageRate = wageRate;
+        if(limit > 1){
+            Random random = new Random();
+            this.limit = random.nextInt(limit - 1) + 1;
+        }
+        else{
+            this.limit = 1;
+        }
     }
     
-    public Task makeTask(){
+    public List<Task> makeTask(){
         Random random = new Random();
-        int i = random.nextInt(Task.values().length);        
-        return Task.values()[i];
+        List<Task> tasks = new ArrayList<>();
+        for(int j = 0; j < limit; j++){
+            int i = random.nextInt(Task.values().length);
+            tasks.add(Task.values()[i]);
+        }
+        return tasks;
     }
 
     @Override

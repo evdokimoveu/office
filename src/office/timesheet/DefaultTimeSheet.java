@@ -16,12 +16,12 @@ public class DefaultTimeSheet implements TimeSheet{
     private int duration;
 
     public DefaultTimeSheet() {
-        this(8 * 3600 * 1000);
+        this(8 * 3600);
     }
 
     public DefaultTimeSheet(int duration) {        
         this.calendar = Calendar.getInstance();
-        if(duration < 24 * 3600 * 1000){
+        if(duration < 24 * 3600){
             this.duration = duration;
         }
         else{
@@ -35,7 +35,7 @@ public class DefaultTimeSheet implements TimeSheet{
         if(dayNumber != null){
             WorkDay workDay = days.get(dayNumber);
             if(workDay != null){
-                if(duration != null && duration < 24 * 3600 * 1000){
+                if(duration != null && duration < 24 * 3600){
                     workDay.setDuration(duration);
                 }
                 if(weekday != null){

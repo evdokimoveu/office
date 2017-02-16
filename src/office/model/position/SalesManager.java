@@ -27,7 +27,7 @@ public class SalesManager implements Position{
     public Task call() throws Exception {
         try {
             Random random = new Random();
-            hoursWorked = hoursWorked + random.nextInt(3600 * 1000) + 3600 * 1000;
+            hoursWorked = random.nextInt(3600) + 3600;
             task.setDeadline(0);
             task.setWageRate(wageRate);
             Thread.sleep(hoursWorked);

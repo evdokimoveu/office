@@ -1,6 +1,7 @@
 
 package office.model;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +41,7 @@ public class Emploee {
     private WorkDay day;
     private final long startTime;
     private final List<Task> tasksCompleted;
-    private final List<Integer> salaries;
+    private final List<BigDecimal> salaries;
     private Map<String, Position> positions;
     private final TimeSheet timeSheet;
     private final NewTaskCallBack newTaskCallBack;
@@ -105,11 +106,11 @@ public class Emploee {
         return positions.containsKey(positionName);        
     }
 
-    public List<Integer> getSalaries() {
+    public List<BigDecimal> getSalaries() {
         return salaries;
     }
 
-    public void addSalaries(int salary) {
+    public void addSalaries(BigDecimal salary) {
         salaries.add(salary);
     }
     
@@ -144,8 +145,7 @@ public class Emploee {
     }
 
     private class DirectorRun extends TimerTask {
-       
-        
+               
         @Override
         public void run() {            
             if(positions.containsKey(Director.NAME)){
@@ -157,11 +157,13 @@ public class Emploee {
                     if(free){
                         free = false;
                         Director director = (Director) positions.get(Director.NAME);
-                        Task task = director.makeTask();                        
-                        newTaskCallBack.newTaskCall(task);
+                        List<Task> tasks = director.makeTask();                        
+                        for(Task task : tasks){
+                            newTaskCallBack.newTaskCall(task);
+                        }
                         free = true;
                     }                    
-                }, 0, 1, TimeUnit.HOURS);
+                }, 0, 3600, TimeUnit.MILLISECONDS);
             }
         }
     }
@@ -214,7 +216,8 @@ public class Emploee {
             return taskCompleted;
         }
     }
-            
+    
+    //Create new Position object
     private Position getPosition(String positionName){        
         if(positionName.equals(Programmer.NAME)){
             return new Programmer(15);
@@ -223,7 +226,7 @@ public class Emploee {
             return new Designer(13);
         }        
         else if(positionName.equals(Director.NAME)){
-            return new Director(2000);
+            return new Director(2000, 1);
         }
         else if(positionName.equals(SalesManager.NAME)){
             return new SalesManager(1500);

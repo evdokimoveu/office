@@ -95,7 +95,7 @@ public class Office implements Emploee.NewTaskCallBack {
                 }
                 executorService.shutdown();
             }
-        }, 0, 1, TimeUnit.DAYS);
+        }, 0, 30, TimeUnit.SECONDS);
     }
 
 }

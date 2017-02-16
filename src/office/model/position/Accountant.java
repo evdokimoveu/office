@@ -3,6 +3,7 @@ package office.model.position;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import office.model.Emploee;
@@ -28,25 +29,25 @@ public class Accountant {
      * @param emploees 
      */
     public void assessmentSalary(List<Emploee> emploees){
-        int salary;
+        BigDecimal salary;
         for(Emploee emploee : emploees){
-            salary = 0;
+            salary = new BigDecimal(0);
             List<Task> tasks = emploee.getTasksCompleted();            
-            for(Task task : tasks){                
-                salary = salary + task.getTaskPayment();
+            for(Task task : tasks){
+                salary = salary.add(task.getTaskPayment());
             }            
             Map<String, Position> mapPosition = emploee.getPositions();            
             
             //Add fixed wage rate to salary
             if(mapPosition.containsKey(Director.NAME)){                
                 Director director = (Director) mapPosition.get(Director.NAME);
-                salary = salary + director.getWageRate();
+                salary = salary.add(BigDecimal.valueOf(director.getWageRate()));
             }
             
             //Add fixed wage rate to salary
             if(mapPosition.containsKey(SalesManager.NAME)){
                 SalesManager manager = (SalesManager) mapPosition.get(SalesManager.NAME);
-                salary = salary + manager.getWageRate();
+                salary = salary.add(BigDecimal.valueOf(manager.getWageRate()));
             }
             emploee.addSalaries(salary);
         }        
@@ -71,10 +72,10 @@ public class Accountant {
         
         emploees.forEach((emploee) -> {            
             int taskCount = emploee.getTasksCompleted().size();
-            int sumSalary = 0;
+            BigDecimal sumSalary = new BigDecimal(0);
             strBuilder.setLength(0);
-            for(Integer salary : emploee.getSalaries()){                
-                sumSalary = sumSalary + salary;
+            for(BigDecimal salary : emploee.getSalaries()){                
+                sumSalary = sumSalary.add(salary);
             }
             strBuilder.append("|                          |                      |                |");
             strBuilder

@@ -1,6 +1,7 @@
 
 package office.model.position;
 
+import java.math.BigDecimal;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,8 +28,9 @@ public class Tester implements Position{
     public Task call() throws Exception {
         try {
             Random random = new Random();            
-            hoursWorked = hoursWorked + random.nextInt(3600 * 1000) + 3600 * 1000;
-            task.setDeadline(hoursWorked);            
+            hoursWorked = random.nextInt(3600) + 3600;
+            double deadline = BigDecimal.valueOf(hoursWorked / (3600 * 1.0)).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
+            task.setDeadline(deadline);
             task.setWageRate(wageRate);
             Thread.sleep(hoursWorked);
         } catch (InterruptedException ex) {
